@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: web-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-api
+  namespace: web-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-api
+  template:
+    metadata:
+      labels:
+        app: sample-api
+    spec:
+      containers:
+      - name: api-container
+        image: nginx:alpine # We will use a basic Nginx web server for testing
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "200m"
+            memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-api-service
+  namespace: web-app
+spec:
+  type: ClusterIP
+  selector:
+    app: sample-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
